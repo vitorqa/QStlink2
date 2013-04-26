@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     this->ui->b_disconnect->setEnabled(false);
     this->ui->b_send->setEnabled(false);
+    this->ui->b_sendlast->setEnabled(false);
     this->ui->b_receive->setEnabled(false);
     this->ui->b_verify->setEnabled(false);
     this->stlink = new stlinkv2();
@@ -40,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
         QObject::connect(this->ui->b_connect, SIGNAL(clicked()), this, SLOT(Connect()));
         QObject::connect(this->ui->b_disconnect, SIGNAL(clicked()), this, SLOT(Disconnect()));
         QObject::connect(this->ui->b_send, SIGNAL(clicked()), this, SLOT(Send()));
+        QObject::connect(this->ui->b_sendlast, SIGNAL(clicked()), this, SLOT(SendLast()));
         QObject::connect(this->ui->b_receive, SIGNAL(clicked()), this, SLOT(Receive()));
         QObject::connect(this->ui->b_verify, SIGNAL(clicked()), this, SLOT(Verify()));
         QObject::connect(this->ui->b_halt, SIGNAL(clicked()), this, SLOT(HaltMCU()));
@@ -125,6 +127,7 @@ bool MainWindow::Connect()
         if (this->getMCU()) {
             this->ui->gb_bottom->setEnabled(true);
             this->ui->b_send->setEnabled(true);
+            this->ui->b_sendlast->setEnabled(true);
             this->ui->b_receive->setEnabled(true);
             this->ui->b_verify->setEnabled(true);
             return true;
@@ -206,6 +209,37 @@ void MainWindow::Send()
         file.close();
 
         this->Send(this->filename);
+    }
+}
+
+void MainWindow::SendLast()
+{
+    if (!this->filenameSend.isNull() && !this->filenameSend.isEmpty()) {
+        this->log("Sending from "+this->filenameSend);
+        QFile file(this->filenameSend);
+        if (!file.open(QIODevice::ReadOnly)) {
+            qCritical("Could not open the file.");
+            return;
+        }
+        this->log("Size: "+QString::number(file.size()/1024)+"KB");
+
+        if (file.size() > (*this->stlink->device)["flash_size"]*1024) {
+            if(QMessageBox::question(this, "Flash size exceeded", "The file is bigger than the flash size!\n\nThe flash memory will be erased and the new file programmed, continue?", QMessageBox::Yes|QMessageBox::No) != QMessageBox::Yes){
+                return;
+            }
+        }
+        else {
+            if(QMessageBox::question(this, "Confirm", "The flash memory will be erased and the new file programmed, continue?", QMessageBox::Yes|QMessageBox::No) != QMessageBox::Yes){
+                return;
+            }
+        }
+        file.close();
+
+        this->Send(this->filenameSend);
+    }
+    else {
+        qCritical("You need to send a file first!");
+        return;
     }
 }
 

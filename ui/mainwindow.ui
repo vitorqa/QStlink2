@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>695</width>
-    <height>505</height>
+    <width>794</width>
+    <height>510</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -54,6 +54,13 @@
          <widget class="QPushButton" name="b_send">
           <property name="text">
            <string>Send...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="b_sendlast">
+          <property name="text">
+           <string>Send Last File</string>
           </property>
          </widget>
         </item>

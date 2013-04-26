@@ -62,6 +62,7 @@ private:
     stlinkv2 *stlink;
     DeviceList *devices;
     QString filename;
+    QString filenameSend;
     QString username;
 
 private slots:
@@ -72,6 +73,7 @@ private slots:
     bool getMCU();
     void getStatus();
     void Send();
+    void SendLast();
     void Receive();
     void Verify();
     void ResetMCU();
